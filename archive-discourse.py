@@ -46,10 +46,12 @@ from shutil import rmtree
 # increase the number of max_retries to connect.
 # Doesn't seem to be necessary for all sites but it *is* necessary for Meta.
 
+from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 
 s = requests.Session()
-s.mount(base_url, HTTPAdapter(max_retries=5))
+retries = Retry(total=1000, backoff_factor=0.1, status_forcelist=[ 500, 502, 504, ])
+s.mount(base_url, HTTPAdapter(max_retries=retries))
 
 # Templates for the webpages
 base_scheme = urlparse(base_url).scheme
